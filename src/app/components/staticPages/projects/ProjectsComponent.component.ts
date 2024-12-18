@@ -24,3 +24,4 @@ export class ProjectsComponent {
     return this.router.navigate(['/'+link]);
   }
 }
+//test
