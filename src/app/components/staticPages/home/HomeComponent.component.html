@@ -5,13 +5,9 @@
   <div class="relative flex justify-center items-center text-center h-96 w-96">
     <!-- SVG Background Filling the Whole Div Including Extra Margins -->
     <svg class="absolute w-[calc(100%+240px)] h-[calc(100%+100px)] z-0" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
-      <!-- Arc from Bottom to Left -->
       <path d="M 115 380 A 200 200 0 0 1 0 230" stroke="orange" stroke-width="10" fill="none" />
-      <!-- Arc from Left to Top -->
       <path d="M 0 170 A 200 200 0 0 1 135 20" stroke="purple" stroke-width="10" fill="none" />
-      <!-- Arc from Top to Right -->
       <path d="M 265 20 A 200 200 0 0 1 400 170" stroke="blue" stroke-width="10" fill="none" />
-      <!-- Arc from Right to Bottom -->
       <path d="M 400 230 A 200 200 0 0 1 285 380" stroke="green" stroke-width="10" fill="none" />
     </svg>
 
@@ -22,32 +18,28 @@
     <!-- Top Button -->
     <button
       (click)="navigateTo('career')"
-      class="absolute bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-300"
-      style="top: -50px; left: 50%; transform: translateX(-50%);">
+      class="absolute bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-300 top-[-50px] sm:top-[-60px] left-1/2 transform -translate-x-1/2">
       My Career
     </button>
 
     <!-- Right Button (Further Away) -->
     <button
       (click)="navigateTo('projects')"
-      class="absolute bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-green-300"
-      style="right: -120px; top: 50%; transform: translateY(-50%);">
+      class="absolute bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-green-300 right-[-120px] sm:right-[-150px] top-1/2 transform -translate-y-1/2">
       My Projects
     </button>
 
     <!-- Left Button (Further Away) -->
     <button
       (click)="navigateTo('about')"
-      class="absolute bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-indigo-300"
-      style="left: -120px; top: 50%; transform: translateY(-50%);">
+      class="absolute bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-indigo-300 left-[-120px] sm:left-[-150px] top-1/2 transform -translate-y-1/2">
       About Me
     </button>
 
     <!-- Bottom Button -->
     <button
       (click)="navigateTo('map')"
-      class="absolute bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-yellow-300"
-      style="bottom: -50px; left: 50%; transform: translateX(-50%);">
+      class="absolute bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-yellow-300 bottom-[-50px] sm:bottom-[-60px] left-1/2 transform -translate-x-1/2">
       Interactive Map
     </button>
   </div>
