@@ -1,0 +1,15 @@
+<div class="graph-container">
+  <div *ngFor="let project of projects; let i = index" class="project-node">
+    <!-- Progetto -->
+    <graph-entry
+      [link]="project.link"
+      [name]="project.name"
+      [description]="project.description"
+      customClass="w-64 h-64 bg-gray-100 rounded-xl shadow-xl m-6 p-4 flex flex-col justify-between items-center"
+    >
+    </graph-entry>
+
+    <!-- Collegamento tra i progetti -->
+    <div *ngIf="i < projects.length - 1" class="connector-line"></div>
+  </div>
+</div>

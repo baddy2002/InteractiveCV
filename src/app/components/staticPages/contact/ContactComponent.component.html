@@ -1,0 +1,71 @@
+<app-header></app-header>
+
+<div class="min-h-screen bg-gradient-to-b from-gray-100 to-white flex flex-col items-center justify-center px-4 py-12">
+  <!-- Contact Section -->
+  <div class="text-center max-w-4xl mx-auto bg-white p-8 rounded-xl shadow-lg">
+    <h1 class="text-4xl font-extrabold text-gray-600 mb-6">Get in Touch</h1>
+
+    <p class="text-lg text-gray-600 mb-8">
+      I'd love to connect with you! Feel free to reach out to me through any of the following channels:
+    </p>
+
+    <!-- Contact Links -->
+    <div class="flex flex-col items-center space-y-6">
+
+      <!-- Link per aprire il popup -->
+      <a (click)="openMailPopup($event)" class="flex items-center space-x-2 text-gray-600 hover:text-gray-700 text-xl font-semibold">
+        <i class="fa fa-envelope" aria-hidden="true"></i>
+        <span>Email</span>
+      </a>
+
+      <!-- Popup (nascosto inizialmente) -->
+      <!-- Popup (nascosto inizialmente) -->
+      <div *ngIf="showMailPopup" class="fixed inset-0 flex justify-center items-center bg-gray-800 bg-opacity-50 z-50">
+        <div class="bg-white p-6 rounded-lg shadow-lg w-80">
+          <h2 class="text-xl font-semibold mb-4">Choose your email client</h2>
+          <div class="flex justify-around mb-4">
+            <!-- Gmail -->
+            <button (click)="openEmailClient('gmail')" class="flex items-center space-x-2">
+              <img class="w-8 h-8" src="images/gmail.png" alt="Gmail">
+              <span>Gmail</span>
+            </button>
+            <!-- Outlook -->
+            <button (click)="openEmailClient('outlook')" class="flex items-center space-x-2">
+              <img class="w-10 h-8" src="images/outlook.png" alt="Outlook">
+              <span>Outlook</span>
+            </button>
+          </div>
+          <div class="flex justify-around">
+            <!-- Yahoo -->
+            <button (click)="openEmailClient('yahoo')" class="flex items-center space-x-2">
+              <img class="w-10 h-8" src="images/yahooMail.png" alt="Yahoo">
+              <span>Yahoo</span>
+            </button>
+            <!-- Other -->
+            <button (click)="openEmailClient('other')" class="flex items-center space-x-2">
+              <i class="fa fa-envelope"></i>
+              <span>Other</span>
+            </button>
+          </div>
+          <div class="mt-4 text-center">
+            <button (click)="closeMailPopup()" class="text-blue-500">Cancel</button>
+          </div>
+        </div>
+      </div>
+      <!-- LinkedIn -->
+      <a href="https://www.linkedin.com/in/andrea-benassi-78a03a237/" target="_blank" class="flex items-center space-x-2 text-gray-600 hover:text-gray-700 text-xl font-semibold">
+        <i class="fa fa-linkedin" aria-hidden="true"></i>
+        <span>LinkedIn</span>
+      </a>
+
+      <!-- Instagram -->
+      <a href="https://www.instagram.com/magic.baddy_/" target="_blank" class="flex items-center space-x-2 text-gray-600 hover:text-gray-700 text-xl font-semibold">
+        <i class="fa fa-instagram" aria-hidden="true"></i>
+        <span>Instagram</span>
+      </a>
+
+    </div>
+  </div>
+</div>
+
+<app-footer></app-footer>

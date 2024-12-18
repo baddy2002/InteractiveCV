@@ -1,0 +1,33 @@
+.graph-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.project-node {
+  position: relative;
+  margin-bottom: 0; /* Rimuove spazio tra i nodi */
+}
+
+.graph-entry {
+  width: 160px;
+  height: 160px;
+  background-color: #e0e0e0;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.graph-entry:hover {
+  transform: scale(1.05);
+}
+
+.connector-line {
+  width: 2px;
+  height: 40px; /* Lunghezza della linea */
+  background-color: #ccc;
+  margin: 0 auto;
+}
