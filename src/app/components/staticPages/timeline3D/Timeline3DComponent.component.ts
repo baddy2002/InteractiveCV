@@ -9,11 +9,12 @@ import {
 import { THREE } from './Timeline3DComponent.js';
 import { HeaderComponent } from '../../common/header/header.component';
 import { FooterComponent } from '../../common/footer/footer.component';
+import {CommonModule} from '@angular/common';
 
 @Component({
   selector: 'app-timeline',
   standalone: true,
-  imports: [HeaderComponent, FooterComponent],
+  imports: [HeaderComponent, FooterComponent, CommonModule],
   templateUrl: './Timeline3DComponent.component.html',
 })
 export class Timeline3DComponent implements OnInit, AfterViewInit {
@@ -24,6 +25,8 @@ export class Timeline3DComponent implements OnInit, AfterViewInit {
   private wallSpacing = 10;
   private playerSpeed = 0.5; // Velocità di movimento del giocatore
   private clock!: THREE.Clock;
+  isMobileDevice: boolean = window.innerWidth <= 900;
+  private moveDirection = {up: 0, down: 0, left: 0, right: 0 };
   private num_spaces_right: number = 2;
   private num_spaces_left: number = 2;
   private first_space_left: number = 0;
@@ -37,6 +40,10 @@ export class Timeline3DComponent implements OnInit, AfterViewInit {
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color(0x87ceeb); // Sky blue
     this.clock = new THREE.Clock();
+    window.addEventListener('resize', () => {
+      this.isMobileDevice = window.innerWidth <= 900;
+      console.log("size: ", window.innerWidth);
+    });
   }
 
   private pathLimits = {
@@ -106,18 +113,19 @@ export class Timeline3DComponent implements OnInit, AfterViewInit {
     let newX = this.player.position.x;
     let newZ = this.player.position.z;
 
-    if (this.keys['ArrowUp'] || this.keys['w']) {
+    if (this.keys['ArrowUp'] || this.keys['w'] || (this.isMobileDevice && this.moveDirection.up)) {
       newZ -= this.playerSpeed;
     }
-    if (this.keys['ArrowDown'] || this.keys['s']) {
+    if (this.keys['ArrowDown'] || this.keys['s'] || (this.isMobileDevice && this.moveDirection.down)) {
       newZ += this.playerSpeed;
     }
-    if (this.keys['ArrowLeft'] || this.keys['a']) {
+    if (this.keys['ArrowLeft'] || this.keys['a'] || (this.isMobileDevice && this.moveDirection.left)) {
       newX -= this.playerSpeed;
     }
-    if (this.keys['ArrowRight'] || this.keys['d']) {
+    if (this.keys['ArrowRight'] || this.keys['d'] || (this.isMobileDevice && this.moveDirection.right)) {
       newX += this.playerSpeed;
     }
+
 
     return { newX, newZ };
   }
@@ -129,66 +137,39 @@ export class Timeline3DComponent implements OnInit, AfterViewInit {
     maxZ: 80,
   };
 
-  private enableTouchpadControls(): void {
-    const touchpad = document.createElement('div');
-    touchpad.style.position = 'absolute';
-    touchpad.style.top = '0';
-    touchpad.style.left = '0';
-    touchpad.style.width = '100%';
-    touchpad.style.height = '100%';
-    touchpad.style.zIndex = '1000'; // Assicurati che sia sopra altri elementi
-    touchpad.style.background = ''; // Per debug: puoi renderlo trasparente
-    touchpad.style.cursor = 'pointer';
-    document.body.appendChild(touchpad);
+  // Aggiungi i listener per il movimento del joystick
+  private addJoystickListeners(): void {
+    const directions = ['up', 'down', 'left', 'right'];
 
-    let isInteracting = false;
-    let lastX = 0;
-    let lastY = 0;
+    directions.forEach(direction => {
+      const button = document.getElementById(direction);
 
-    const startInteraction = (x: number, y: number) => {
-      isInteracting = true;
-      lastX = x;
-      lastY = y;
-    };
+      // Ascolta l'evento 'mousedown' per attivare il movimento
+      button?.addEventListener('mousedown', () => this.handleJoystickInput(direction, true));
 
-    const updateInteraction = (x: number, y: number) => {
-      if (!isInteracting) return;
+      // Ascolta l'evento 'mouseup' per fermare il movimento
+      button?.addEventListener('mouseup', () => this.handleJoystickInput(direction, false));
 
-      const deltaX = x - lastX;
-      const deltaY = y - lastY;
-
-      // Aggiorna la posizione del personaggio
-      this.updatePlayerPosition(
-        this.player.position.x + deltaX * 0.01,
-        this.player.position.z + deltaY * 0.01
-      );
-
-      lastX = x;
-      lastY = y;
-    };
-
-    const endInteraction = () => {
-      isInteracting = false;
-    };
-
-    // Eventi per il mouse
-    touchpad.addEventListener('mousedown', (event) => startInteraction(event.clientX, event.clientY));
-    touchpad.addEventListener('mousemove', (event) => updateInteraction(event.clientX, event.clientY));
-    touchpad.addEventListener('mouseup', () => endInteraction());
-    touchpad.addEventListener('mouseleave', () => endInteraction());
-
-    // Eventi per il touch
-    touchpad.addEventListener('touchstart', (event) => {
-      const touch = event.touches[0];
-      startInteraction(touch.clientX, touch.clientY);
+      // Supporto per i dispositivi touch
+      button?.addEventListener('touchstart', () => this.handleJoystickInput(direction, true));
+      button?.addEventListener('touchend', () => this.handleJoystickInput(direction, false));
     });
-    touchpad.addEventListener('touchmove', (event) => {
-      const touch = event.touches[0];
-      updateInteraction(touch.clientX, touch.clientY);
-    });
-    touchpad.addEventListener('touchend', () => endInteraction());
   }
 
+  private handleJoystickInput(direction: string, isPressed: boolean): void {
+    if (direction === 'up') {
+      this.moveDirection.up = isPressed ? 1 : 0;  // Movimento in avanti
+    }
+    if (direction === 'down') {
+      this.moveDirection.down = isPressed ? 1 : 0;  // Movimento indietro
+    }
+    if (direction === 'left') {
+      this.moveDirection.left = isPressed ? 1 : 0;  // Movimento a sinistra
+    }
+    if (direction === 'right') {
+      this.moveDirection.right = isPressed ? 1 : 0;  // Movimento a destra
+    }
+  }
 
   ngAfterViewInit(): void {
     const canvas = this.elRef.nativeElement.querySelector('#three-canvas') as HTMLCanvasElement;
@@ -207,7 +188,10 @@ export class Timeline3DComponent implements OnInit, AfterViewInit {
     this.addWalls();
     this.addHorizontalPathsLimits();
     this.addPlayer();
-    this.enableTouchpadControls()
+    if (this.isMobileDevice) {
+      console.log("is mobile")
+      this.addJoystickListeners();
+    }
     this.animate();
   }
 
@@ -316,10 +300,10 @@ export class Timeline3DComponent implements OnInit, AfterViewInit {
     let directionX = 0;
     let directionZ = 0;
 
-    if (this.keys['ArrowUp']) directionZ = 1; // Movimento avanti
-    if (this.keys['ArrowDown']) directionZ = -1; // Movimento indietro
-    if (this.keys['ArrowLeft']) directionX = 1; // Movimento a sinistra
-    if (this.keys['ArrowRight']) directionX = -1; // Movimento a destra
+    if (this.keys['ArrowUp'] || this.keys['w'] || (this.isMobileDevice && this.moveDirection.up)) directionZ = 1; // Movimento avanti
+    if (this.keys['ArrowDown'] || this.keys['s'] || (this.isMobileDevice && this.moveDirection.down)) directionZ = -1; // Movimento indietro
+    if (this.keys['ArrowLeft'] || this.keys['a'] || (this.isMobileDevice && this.moveDirection.left)) directionX = 1; // Movimento a sinistra
+    if (this.keys['ArrowRight'] || this.keys['d'] || (this.isMobileDevice && this.moveDirection.right)) directionX = -1; // Movimento a destra
 
     // Calcola il vettore direzione risultante
     const magnitude = Math.sqrt(directionX ** 2 + directionZ ** 2);

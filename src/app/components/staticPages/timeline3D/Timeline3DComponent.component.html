@@ -1,23 +1,30 @@
 <app-header></app-header>
 
-
-<div id="three-container">
-  <canvas id="three-canvas"></canvas>
+<div id="three-container" class="relative w-full h-screen overflow-hidden">
+  <canvas id="three-canvas" class="block w-full h-full"></canvas>
 </div>
+
+<!-- Joystick container, visibile solo su dispositivi mobili -->
+<div id="joystick-container" *ngIf="isMobileDevice" class="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex flex-col items-center space-y-4">
+  <button id="up" class="joystick-btn text-4xl">↑</button>
+  <div class="flex justify-between w-24">
+    <button id="left" class="joystick-btn text-4xl">←</button>
+    <button id="right" class="joystick-btn text-4xl">→</button>
+  </div>
+  <button id="down" class="joystick-btn text-4xl">↓</button>
+</div>
+
+<app-footer></app-footer>
+
 <style>
-  #three-container {
-    position: relative;
-    width: 100%;
-    height: 100vh;
-    overflow: hidden;
+  .joystick-btn {
+    @apply w-16 h-16 text-3xl font-bold bg-blue-500 text-white border-4 border-blue-700 rounded-full shadow-xl hover:bg-blue-400 active:bg-blue-600 transition-colors duration-200;
   }
 
-  canvas {
-    display: block;
-    width: 100%;
-    height: 100%;
+  /* Stile per il container del joystick */
+  #joystick-container {
+    z-index: 10; /* Assicurati che il joystick sia sopra gli altri elementi */
   }
-
 </style>
 
 <app-footer></app-footer>
