@@ -129,6 +129,67 @@ export class Timeline3DComponent implements OnInit, AfterViewInit {
     maxZ: 80,
   };
 
+  private enableTouchpadControls(): void {
+    const touchpad = document.createElement('div');
+    touchpad.style.position = 'absolute';
+    touchpad.style.top = '0';
+    touchpad.style.left = '0';
+    touchpad.style.width = '100%';
+    touchpad.style.height = '100%';
+    touchpad.style.zIndex = '1000'; // Assicurati che sia sopra altri elementi
+    touchpad.style.background = ''; // Per debug: puoi renderlo trasparente
+    touchpad.style.cursor = 'pointer';
+    document.body.appendChild(touchpad);
+
+    let isInteracting = false;
+    let lastX = 0;
+    let lastY = 0;
+
+    const startInteraction = (x: number, y: number) => {
+      isInteracting = true;
+      lastX = x;
+      lastY = y;
+    };
+
+    const updateInteraction = (x: number, y: number) => {
+      if (!isInteracting) return;
+
+      const deltaX = x - lastX;
+      const deltaY = y - lastY;
+
+      // Aggiorna la posizione del personaggio
+      this.updatePlayerPosition(
+        this.player.position.x + deltaX * 0.01,
+        this.player.position.z + deltaY * 0.01
+      );
+
+      lastX = x;
+      lastY = y;
+    };
+
+    const endInteraction = () => {
+      isInteracting = false;
+    };
+
+    // Eventi per il mouse
+    touchpad.addEventListener('mousedown', (event) => startInteraction(event.clientX, event.clientY));
+    touchpad.addEventListener('mousemove', (event) => updateInteraction(event.clientX, event.clientY));
+    touchpad.addEventListener('mouseup', () => endInteraction());
+    touchpad.addEventListener('mouseleave', () => endInteraction());
+
+    // Eventi per il touch
+    touchpad.addEventListener('touchstart', (event) => {
+      const touch = event.touches[0];
+      startInteraction(touch.clientX, touch.clientY);
+    });
+    touchpad.addEventListener('touchmove', (event) => {
+      const touch = event.touches[0];
+      updateInteraction(touch.clientX, touch.clientY);
+    });
+    touchpad.addEventListener('touchend', () => endInteraction());
+  }
+
+
   ngAfterViewInit(): void {
     const canvas = this.elRef.nativeElement.querySelector('#three-canvas') as HTMLCanvasElement;
     this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
@@ -146,7 +207,7 @@ export class Timeline3DComponent implements OnInit, AfterViewInit {
     this.addWalls();
     this.addHorizontalPathsLimits();
     this.addPlayer();
-
+    this.enableTouchpadControls()
     this.animate();
   }
 
