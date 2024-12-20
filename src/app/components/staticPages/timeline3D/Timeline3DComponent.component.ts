@@ -6,7 +6,7 @@ import {
   AfterViewInit,
   HostListener,
 } from '@angular/core';
-import { THREE } from './Timeline3DComponent.js';
+import { THREE, GLTFLoader, DRACOLoader } from './Timeline3DComponent.js';
 import { HeaderComponent } from '../../common/header/header.component';
 import { FooterComponent } from '../../common/footer/footer.component';
 import {CommonModule} from '@angular/common';
@@ -33,6 +33,7 @@ export class Timeline3DComponent implements OnInit, AfterViewInit {
   private first_space_right: number = 15;
   private walls: THREE.Mesh[] = [];
   private keys: { [key: string]: boolean } = {};
+  private mixer: THREE.AnimationMixer | null = null;
 
   constructor(private elRef: ElementRef, private renderer2: Renderer2) {}
 
@@ -109,25 +110,31 @@ export class Timeline3DComponent implements OnInit, AfterViewInit {
     return true;
   }
 
-  private calculatePlayerMovement(): { newX: number; newZ: number } {
+  private calculatePlayerMovement(): { newX: number; newZ: number,  direction: THREE.Vector3 } {
     let newX = this.player.position.x;
     let newZ = this.player.position.z;
-
+    const direction = new THREE.Vector3();
     if (this.keys['ArrowUp'] || this.keys['w'] || (this.isMobileDevice && this.moveDirection.up)) {
       newZ -= this.playerSpeed;
+      direction.set(0, 0, -1);
     }
     if (this.keys['ArrowDown'] || this.keys['s'] || (this.isMobileDevice && this.moveDirection.down)) {
       newZ += this.playerSpeed;
+      direction.set(0, 0, 1);
+
     }
     if (this.keys['ArrowLeft'] || this.keys['a'] || (this.isMobileDevice && this.moveDirection.left)) {
       newX -= this.playerSpeed;
+      direction.set(-1, 0, 0);
     }
     if (this.keys['ArrowRight'] || this.keys['d'] || (this.isMobileDevice && this.moveDirection.right)) {
       newX += this.playerSpeed;
+      direction.set(1, 0, 0);
+
     }
 
 
-    return { newX, newZ };
+    return { newX, newZ, direction };
   }
 
   private cameraLimits = {
@@ -276,17 +283,51 @@ export class Timeline3DComponent implements OnInit, AfterViewInit {
   }
 
   private addPlayer(): void {
-    const playerMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000 }); // Red
-    const playerGeometry = new THREE.BoxGeometry(1, 2, 1);
-    this.player = new THREE.Mesh(playerGeometry, playerMaterial);
-    this.player.position.set(0, 1, 0);
-    this.scene.add(this.player);
+    const loader = new GLTFLoader();
+    /*const dracoLoader = new DRACOLoader();
+    dracoLoader.setDecoderPath( '/examples/jsm/libs/draco/' );
+    loader.setDRACOLoader( dracoLoader );*/
+    // Carica il modello 3D (assicurati di usare il percorso corretto)
+    try {
+      loader.load('3Dmodels/scene.gltf', (gltf: any) => {
+        const model = gltf.scene;
+        model.scale.set(0.015, 0.015, 0.015)
+        this.mixer = new THREE.AnimationMixer(model);
+
+        // Posizioniamo il modello
+        model.position.set(0, 1, 0);
+        const walkClip = gltf.animations.find((clip: any) => clip.name === 'Walk');
+        if (walkClip) {
+          const walkAction = this.mixer.clipAction(walkClip);
+          walkAction.play(); // Avvia l'animazione
+        }
+        this.scene.add(model);
+
+        // Animazioni
+        this.mixer = new THREE.AnimationMixer(model);
+
+        // Aggiungi l'animazione della camminata (ad esempio, "Walk" è il nome dell'animazione nel modello glTF)
+        gltf.animations.forEach((clip: any) => {
+          this.mixer?.clipAction(clip).play();
+        });
+
+        this.player = model; // Impostiamo il modello come il giocatore
+      });
+    } catch (error) {
+      console.error("dio cane",error);
+    }
   }
 
   private animate(): void {
     requestAnimationFrame(() => this.animate());
-    const { newX, newZ } = this.calculatePlayerMovement();
-    this.updatePlayerPosition(newX, newZ);
+    const { newX, newZ, direction } = this.calculatePlayerMovement();
+    // Aggiorna il mixer se presente
+    if (this.mixer) {
+      this.mixer.update(0.016); // Aggiorna l'animazione
+    }
+
+
+    this.updatePlayerPosition(newX, newZ, direction);
     this.updateCameraPosition(); // Aggiorna la telecamera
     this.renderer.render(this.scene, this.camera);
   }
@@ -323,13 +364,20 @@ export class Timeline3DComponent implements OnInit, AfterViewInit {
     }else {
       cameraZ += Math.max(this.cameraLimits.minZ, Math.min(offset.z, this.cameraLimits.maxZ));
     }
-      cameraZ
+
     // Posiziona la telecamera e orientala verso il giocatore
     this.camera.position.set(cameraX, this.player.position.y + offset.y, cameraZ);
     this.camera.lookAt(this.player.position);
   }
 
-  private updatePlayerPosition(newX: number, newZ: number): void {
+  private updatePlayerPosition(newX: number, newZ: number, direction: THREE.Vector3): void {
+    const targetDirection = direction.clone().normalize(); // Direzione normalizzata
+
+    // Calcola l'angolo verso la nuova direzione
+    const angle = Math.atan2(targetDirection.x, targetDirection.z);
+
+    // Ruota il modello (asse Y per Three.js)
+    this.player.rotation.y = angle;
     if (this.isWithinPathLimits(newX, newZ)) {
       this.player.position.set(newX, this.player.position.y, newZ);
     } else {

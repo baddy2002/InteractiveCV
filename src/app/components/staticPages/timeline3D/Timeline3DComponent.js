@@ -1,4 +1,4 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-
-export {THREE, GLTFLoader};
+import {DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
+export {THREE, GLTFLoader, DRACOLoader};
