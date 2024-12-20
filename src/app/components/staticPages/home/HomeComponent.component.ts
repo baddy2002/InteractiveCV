@@ -13,6 +13,14 @@ export class HomeComponent {
   constructor(private readonly router: Router) { }
 
   navigateTo(link: string) {
-    return this.router.navigate(['/'+link]);
+    if(link==='/timeline'){
+      if (!window.WebGLRenderingContext) {
+        return this.router.navigate(['/timeline-2d']);
+      } else {
+        return this.router.navigate(['/timeline-3d']);
+      }
+    }
+    else
+      return this.router.navigate(['/'+link]);
   }
 }

@@ -22,7 +22,12 @@
     "lib": [
       "ES2022",
       "dom"
-    ]
+    ],
+    "typeRoots": ["node_modules/@types"],
+    "types": ["three"],
+    "allowJs": true,
+    "resolveJsonModule": true,
+    "checkJs": false
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,
