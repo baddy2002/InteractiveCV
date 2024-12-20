@@ -98,8 +98,6 @@ export class Timeline3DComponent implements OnInit, AfterViewInit {
       return false;
     }
 
-
-
     // Se non si trova in nessun percorso orizzontale, è nei limiti principali
     return true;
   }
