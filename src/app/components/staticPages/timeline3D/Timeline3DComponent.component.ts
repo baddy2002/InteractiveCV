@@ -23,7 +23,7 @@ export class Timeline3DComponent implements OnInit, AfterViewInit {
   private renderer!: THREE.WebGLRenderer;
   private player!: THREE.Mesh;
   private wallSpacing = 10;
-  private playerSpeed = 0.5; // Velocità di movimento del giocatore
+  private playerSpeed = 0.2; // Velocità di movimento del giocatore
   private clock!: THREE.Clock;
   isMobileDevice: boolean = window.innerWidth <= 900;
   private moveDirection = {up: 0, down: 0, left: 0, right: 0 };
@@ -233,6 +233,7 @@ export class Timeline3DComponent implements OnInit, AfterViewInit {
       horizontalPath.rotation.x = -Math.PI / 2;
       horizontalPath.position.set(25, 0.01, zPosition); // Centered on X-axis
       this.scene.add(horizontalPath);
+      this.addStructure(65, zPosition, true);
     }
 
     // Add paths for spaces on the left
@@ -243,8 +244,28 @@ export class Timeline3DComponent implements OnInit, AfterViewInit {
       horizontalPath.rotation.x = -Math.PI / 2;
       horizontalPath.position.set(-25, 0.01, zPosition); // Centered on X-axis
       this.scene.add(horizontalPath);
+      this.addStructure(-65, zPosition, false)
     }
 
+  }
+
+  private addStructure(endPath: number, zPosition: number, shouldRotate: boolean): void {
+    const loader = new GLTFLoader();
+    const modelPath = '/3Dmodels/informatica.glb';
+
+
+    loader.load(modelPath, (gltf: any) => {
+      const model = gltf.scene;
+      model.scale.set(10, 10, 10); // Scale the model as needed
+      model.position.set(endPath, 0.01, zPosition); // Position it in the center on X-axis and slightly above the ground
+      // Rotate the model by 180 degrees around the Y-axis if shouldRotate is true
+      if (shouldRotate) {
+        model.rotation.y = Math.PI *1.5; // 180 degrees in radians
+      }
+      this.scene.add(model);
+    }, undefined, (error: any) => {
+      console.error('An error occurred while loading the model:', error);
+    });
   }
 
   private addWalls(): void {
@@ -295,7 +316,7 @@ export class Timeline3DComponent implements OnInit, AfterViewInit {
         this.mixer = new THREE.AnimationMixer(model);
 
         // Posizioniamo il modello
-        model.position.set(0, 1, 0);
+        model.position.set(0, 1, 70);
         const walkClip = gltf.animations.find((clip: any) => clip.name === 'Walk');
         if (walkClip) {
           const walkAction = this.mixer.clipAction(walkClip);
