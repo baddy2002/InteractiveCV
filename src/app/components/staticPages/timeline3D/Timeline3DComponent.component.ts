@@ -314,16 +314,30 @@ export class Timeline3DComponent implements OnInit, AfterViewInit {
         this.player = model; // Impostiamo il modello come il giocatore
       });
     } catch (error) {
-      console.error("dio cane",error);
+      console.error("error: ",error);
     }
   }
 
   private animate(): void {
     requestAnimationFrame(() => this.animate());
     const { newX, newZ, direction } = this.calculatePlayerMovement();
-    // Aggiorna il mixer se presente
-    if (this.mixer) {
-      this.mixer.update(0.016); // Aggiorna l'animazione
+
+    const time = this.clock.getElapsedTime();
+
+    // Controlla se il giocatore si sta muovendo
+    const isMoving = newX !== this.player?.position.x || newZ !== this.player?.position.z;
+
+    if (isMoving && this.player) {
+      // Anima solo quando c'è movimento
+      const time = this.clock.getElapsedTime();
+
+      this.player.rotation.z = Math.sin(time * this.playerSpeed*5) * 0.1; // Oscillazione laterale
+      this.player.rotation.x = Math.cos(time * this.playerSpeed*5) * 0.05; // Movimento avanti e indietro
+      this.player.position.y = Math.abs(Math.sin(time * this.playerSpeed*5)) * 0.05; // Leggero movimento verticale
+    } else if (this.player) {
+      // Resetta l'orientamento se non si muove
+      this.player.rotation.z = 0;
+      this.player.rotation.x = 0;
     }
 
 
